@@ -5,11 +5,59 @@ using CosmicGameAPI.Model.ViewModel.BaskiChart;
 using CosmicGameAPI.Model.ViewModel.TraditionalChart;
 using CosmicGameAPI.Model.ViewModel.VimsoChart;
 using CosmicGameAPI.Utility.SDK;
+using System.Text;
 
 namespace CosmicGameAPI.Service.Implementation
 {
     public static class ChartCreator
     {
+
+        public static DateTime GetSunRiseSet(double[] GeoPosition, string timezonestr,DateTime dob, int Status)
+        {
+            try
+            {
+                string starname = string.Empty;
+                int SE_SUN = 0;
+                int iPlanetNo = SE_SUN;
+                int iFlag = 0;
+                int SE_CALC_RISE = 1;
+                int SE_CALC_SET = 2;
+                double sunRise = 0;
+                double sunSet = 0.0f;
+                StringBuilder sErr = new StringBuilder(255);
+                DateTime dateTime = DateTime.Now;
+
+
+                TimeSpan usersTimeZone = TimeSpan.Parse(timezonestr.Substring(1, timezonestr.Length - 1));//parameter which is needed for method
+                double timezone = usersTimeZone.TotalHours;
+                if (timezonestr[0] == '-')
+                    timezone *= -1;
+
+                SDK_Communicator.SetEphePath(AppDomain.CurrentDomain.BaseDirectory);
+
+                TimeUTC timeUTC = SDK_Communicator.SwitchUsersTimeToUTC(dob, timezone);
+                double julianDay = SDK_Communicator.CalculateJulianDay(timeUTC);
+
+                if (Status == 0)
+                {
+                    SDK_Communicator.GetSunRise(julianDay, iPlanetNo, starname, iFlag, SE_CALC_RISE, GeoPosition, 0.0f, 0.0f, out sunRise, sErr);
+                    dateTime = SDK_Communicator.JulianTimeToUTC(sunRise, timezone);
+                }
+                if (Status == 1)
+                {
+                    SDK_Communicator.GetSunRise(julianDay, iPlanetNo, starname, iFlag, SE_CALC_SET, GeoPosition, 0.0f, 0.0f, out sunSet, sErr);
+                    dateTime = SDK_Communicator.JulianTimeToUTC(sunSet, timezone);
+                }
+                SDK_Communicator.CloseSDK();
+                return dateTime;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         public static TraditionalChartViewModel GetTraditionalChart(List<BhavaAndPlanet> lstPlanetGridData)
         {
 

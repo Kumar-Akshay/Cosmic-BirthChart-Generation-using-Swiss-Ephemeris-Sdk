@@ -71,7 +71,7 @@ namespace CosmicGameAPI.Utility.SDK
 
         [DllImport(SdkPath)]
 
-        private static extern int swe_calc
+        public static extern int swe_calc
             (
             double tjd,
             int ipl,
@@ -198,10 +198,12 @@ namespace CosmicGameAPI.Utility.SDK
 
 
         [DllImport(SdkPath)]
+        public static extern int swe_rise_trans(
+            double tjd_ut, int ipl, string starname, int epheflag, int rsmi, double[] geopos, double atpress, double attemp, out double trise, StringBuilder serr
+            );
 
-        internal static extern double swe_rise_trans(
-         double tjd_ut, int ipl, char[] starname, double epheflag, int rsmi, double[] geopos, double datm0, double datm1, double trise, string serr
-         );
+        [DllImport(SdkPath)]
+        public static extern void swe_jdut1_to_utc(double tjd_ut, int gregflag, out int year, out int month, out int day, out int hour, out int mint, out double sec);
 
 
 

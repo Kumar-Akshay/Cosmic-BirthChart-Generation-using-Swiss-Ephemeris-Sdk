@@ -1,4 +1,6 @@
+using Microsoft.VisualBasic;
 using System;
+using System.Text;
 
 namespace CosmicGameAPI.Utility.SDK
 {
@@ -39,6 +41,11 @@ namespace CosmicGameAPI.Utility.SDK
             NativeMethods.swe_utc_time_zone(DOB.Year, DOB.Month,DOB.Day, DOB.Hour,
                                            DOB.Minute, DOB.Second, timezone, out int Year, out  int Month,
                                             out int Day, out int Hours, out int Minutes, out double Seconds);
+
+            NativeMethods.swe_utc_time_zone(Year, Month, Day, Hours,
+                                           Minutes, Seconds, timezone, out int Years, out int Months,
+                                            out int Days, out int Hourss, out int Minutess, out double Secondss);
+
             timeUTC.Year = Year;
             timeUTC.Month = Month;
             timeUTC.Day = Day;
@@ -55,12 +62,35 @@ namespace CosmicGameAPI.Utility.SDK
             double julianDay = NativeMethods.UtcToJD(timeUTC.Year, timeUTC.Month, timeUTC.Day, timeUTC.Hours, timeUTC.Minutes, timeUTC.Seconds, serr);
             return julianDay;
         }
-
         public static double GetAyanamsaUt(double julianDay)
         { //What does this method and how to name it
             var result = NativeMethods.swe_get_ayanamsa_ut(julianDay);
 
             return result;
+        }
+
+        public static void GetSunRise(double tjd_ut, int ipl, string starname, int epheflag, int rsmi, double[] geopos, double datm0, double datm1, out double trise, StringBuilder serr)
+        {
+            var result = NativeMethods.swe_rise_trans(tjd_ut, ipl, starname, epheflag, rsmi, geopos, datm0, datm1, out trise, serr);
+        }
+        public static void GetSunSet(double tjd_ut, int ipl, string starname, int epheflag, int rsmi, double[] geopos, double datm0, double datm1, out double tset, StringBuilder serr)
+        {
+            var result = NativeMethods.swe_rise_trans(tjd_ut, ipl, starname, epheflag, rsmi, geopos, datm0, datm1, out tset, serr);
+        }
+
+        public static DateTime JulianTimeToUTC(double tjd_ut, double timezone)
+        {
+            int year = 0, month = 0, day = 0, hour = 0, mint = 0;
+            double sec = 0.0;
+            NativeMethods.swe_jdut1_to_utc(tjd_ut, 1, out year, out month, out day, out hour, out mint, out sec);
+
+
+
+            NativeMethods.swe_utc_time_zone(year, month, day, hour, mint, sec, -timezone, out int Year, out int Month,
+                                            out int Day, out int Hours, out int Minutes, out double Seconds);
+
+            var date = new DateTime(Year, Month, Day, Hours, Minutes, Convert.ToInt32(Seconds));
+            return date;
         }
 
         public static string ConvertDegreesToDMS(double ayanNewCombe)

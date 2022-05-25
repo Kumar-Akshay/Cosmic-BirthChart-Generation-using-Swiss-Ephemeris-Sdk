@@ -11,6 +11,7 @@ using CosmicGameAPI.Utility.SDK;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CosmicGameAPI.Service.Implementation
@@ -49,6 +50,12 @@ namespace CosmicGameAPI.Service.Implementation
             //{
             //    //return RedirectToAction("Create", "CustomAddress", new { returnUrl = "/ChartHolders/AstroChart?chartHolderId=" + chartHolderId });
             //}
+
+            double[] GeoPosition = new double[] { 69.7376286, 25.354928, 0.0 };
+            var timezonestr = "+05:00";
+
+            var sunRise = ChartCreator.GetSunRiseSet(GeoPosition,timezonestr,DateTime.Now,0);  // 0 Sun Rise
+            var sunSet = ChartCreator.GetSunRiseSet(GeoPosition, timezonestr, DateTime.Now, 1);  // 1 Sun Set
 
             // Retrive the chart holder information
             var chartHolder = await _cosmicDbContext.ChartHolders.Where(x => x.ChartHolderId == chartHolderId).FirstOrDefaultAsync();
